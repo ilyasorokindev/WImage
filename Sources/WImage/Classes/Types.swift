@@ -6,15 +6,34 @@
 //
 import Foundation
 
+enum Constants {
+    static let cacheName = "WImageData"
+}
+
 #if os(macOS)
-@available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
+import Cocoa
+
 public typealias WPlatformImage = NSImage
+
+extension Constants {
+    static let scale = 1
+}
+
+extension NSImage {
+    convenience init?(data: Data, scale: Int) {
+        self.init(data: data)
+    }
+}
+
 #else
-@available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
 public typealias WPlatformImage = UIImage
+
+extension Constants {
+    static let scale = UIScreen.main.scale
+}
 #endif
 
-public typealias WCompletion = (WPlatformImage) -> Void
+public typealias WCompletion = (WPlatformImage?) -> Void
 
 public enum Priority {
     case low

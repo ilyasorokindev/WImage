@@ -10,17 +10,17 @@ public class WItem {
    
     public let id: UInt
     public let url: URL
-    private let completion: WCompletion?
-    internal(set) public var width: Int?
-    internal(set) public var height: Int?
-    internal(set) public var priority: Priority
+    internal let completion: WCompletion?
+    internal(set) public var width: CGFloat?
+    internal(set) public var height: CGFloat?
+    internal(set) public var priority = Priority.normal
     
     internal init(id: UInt,
                   url: URL,
-                  completion: WCompletion?,
-                  width: Int?,
-                  height: Int?) {
-        
+                  completion: WCompletion?) {
+        self.id = id
+        self.url = url
+        self.completion = completion
     }
     
 }
