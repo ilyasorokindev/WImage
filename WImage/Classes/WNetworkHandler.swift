@@ -41,7 +41,7 @@ internal class WNetworkHandler: WNetworkHandlerProtocol {
     
     func load(url: URL, completion: @escaping (URL,  WPlatformImage?, Data?, Error?, Int) -> Void) {
         self.updateCounter(value: 1)
-        self.session.dataTask(with: url, completionHandler: { (data, response, error) in
+        let task = self.session.dataTask(with: url) { (data, response, error) in
             completion(url,
                        {
                         if let data = data {
@@ -57,7 +57,8 @@ internal class WNetworkHandler: WNetworkHandlerProtocol {
                         return error
                        }(),
                        self.updateCounter(value: -1))
-        })
+        }
+        task.resume()
     }
     
     @discardableResult

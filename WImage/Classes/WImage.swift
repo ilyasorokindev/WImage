@@ -11,7 +11,7 @@ public class WImage {
     private var networkHandler: WNetworkHandlerProtocol = WNetworkHandler()
     
     private let loadingLocker = NSLock()
-    private var loadingItems = [URL : [UInt : WCompletion?]]()
+    private(set) internal var loadingItems = [URL : [UInt : WCompletion?]]()
     
     private init() {
     }
@@ -45,7 +45,7 @@ public class WImage {
                          completion: completion)
         self.updateItem(item: item, width: width, height: height,
                         priority: priority, resetOther: true)
-        
+        self.loadItem(item: item)
         return item
     }
     
@@ -58,6 +58,7 @@ public class WImage {
         self.cancel(item: item)
         self.updateItem(item: item, width: width, height: height,
                         priority: priority, resetOther: resetOther)
+        self.loadItem(item: item)
         return self
     }
     
@@ -126,7 +127,6 @@ public class WImage {
         if let image = image, let data = data {
             self.storageHanler.saveImage(url: url, image: image, imageData: data)
         }
-
         DispatchQueue.main.async {
             self.loadingLocker.lock()
             self.loadingItems[url]?.values.forEach({ completion in

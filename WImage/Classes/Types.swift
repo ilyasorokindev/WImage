@@ -26,6 +26,8 @@ extension NSImage {
 }
 
 #else
+import UIKit
+
 public typealias WPlatformImage = UIImage
 
 extension Constants {

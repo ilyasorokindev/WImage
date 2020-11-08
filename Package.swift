@@ -30,6 +30,6 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "WImageTests",
-            dependencies: ["WImage/Classes"]),
+            dependencies: ["WImage"]),
     ]
 )
