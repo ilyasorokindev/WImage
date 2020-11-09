@@ -12,7 +12,7 @@ public class WImage {
     private var networkHandler: WNetworkHandlerProtocol = WNetworkHandler()
     
     private let loadingLocker = NSLock()
-    private(set) internal var loadingItems = [URL : [UInt : WCompletion?]]()
+    private(set) internal var loadingItems = [URL : WLoadingModel]()
     
     private init() {
     }
@@ -67,7 +67,11 @@ public class WImage {
     @discardableResult
     public func cancel(item:  WItem) -> WImage  {
         let url = self.makeUrl(item: item)
-        
+        self.loadingLocker.lock()
+        if self.loadingItems[url]?.cancel(id: item.id).isEmpty ?? false{
+            self.loadingItems[url] = nil
+        }
+        self.loadingLocker.unlock()
         return self
     }
     
@@ -102,7 +106,6 @@ public class WImage {
             }
             item.priority = priority ?? item.priority
         }
-        
     }
     
     private func loadItem(item:  WItem) {
@@ -118,17 +121,16 @@ public class WImage {
         self.loadingLocker.lock()
         let loading = self.loadingItems[url] != nil
         if loading {
-            self.loadingItems[url]?[id] = completion
+            self.loadingItems[url]?.add(id: id, completion: completion)
             self.loadingLocker.unlock()
             return
         }
-        self.loadingItems[url] = [id : completion]
-        self.loadingLocker.unlock()
-        self.networkHandler.load(url: url, completion: { url, image, data, error, count in
+        let item = self.networkHandler.load(url: url, completion: { url, image, data, error, count in
             self.downloaded(url: url, image: image, data: data, erro: error, count: count)
         })
-        
-        
+        self.loadingItems[url] =  WLoadingModel(loadingItem: item).add(id: id, completion: completion)
+        self.loadingLocker.unlock()
+        item.start()
     }
     
     private func downloaded(url: URL, image: WPlatformImage?, data: Data?, erro: Error?, count: Int) {
@@ -137,9 +139,7 @@ public class WImage {
         }
         DispatchQueue.main.async {
             self.loadingLocker.lock()
-            self.loadingItems[url]?.values.forEach({ completion in
-                completion?(image)
-            })
+            self.loadingItems[url]?.execute(image: image)
             self.loadingItems[url] = nil
             self.loadingLocker.unlock()
         }
