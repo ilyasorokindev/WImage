@@ -1,5 +1,6 @@
 import Foundation
 
+
 public class WImage {
     public static let shared = WImage()
     
@@ -34,11 +35,12 @@ public class WImage {
         return self
     }
     
+    @discardableResult
     public func load(url: URL,
-                     completion: WCompletion?,
-                     width: CGFloat? = nil,
-                     height: CGFloat? = nil,
-                     priority: Priority = .normal) -> WItem {
+                     width: WPlatformFloat? = nil,
+                     height: WPlatformFloat? = nil,
+                     priority: Priority = .normal,
+                     completion: WCompletion? = nil) -> WItem {
         
         let item = WItem(id: self.createID(),
                          url: url,
@@ -51,8 +53,8 @@ public class WImage {
     
     @discardableResult
     public func update(item:  WItem,
-                       width: CGFloat? = nil,
-                       height: CGFloat? = nil,
+                       width: WPlatformFloat? = nil,
+                       height: WPlatformFloat? = nil,
                        priority: Priority? = nil,
                        resetOther: Bool = false) -> WImage {
         self.cancel(item: item)
@@ -64,7 +66,7 @@ public class WImage {
     
     @discardableResult
     public func cancel(item:  WItem) -> WImage  {
-        let url = self.urlHandler.handle(item: item)
+        let url = self.makeUrl(item: item)
         
         return self
     }
@@ -75,10 +77,16 @@ public class WImage {
         defer { self.counterLocker.unlock() }
         return self.counter
     }
+   
+    private func makeUrl(item:  WItem) -> URL {
+        let width: Int? = item.width != nil ? Int(item.width! * Constants.scale) : nil
+        let height: Int? = item.height != nil ? Int(item.height! * Constants.scale) : nil
+        return self.urlHandler.handle(url: item.url, width: width, height: height)
+    }
     
     private func updateItem(item:  WItem,
-                            width: CGFloat?,
-                            height: CGFloat?,
+                            width: WPlatformFloat?,
+                            height: WPlatformFloat?,
                             priority: Priority?,
                             resetOther: Bool) {
         if resetOther {
@@ -98,7 +106,7 @@ public class WImage {
     }
     
     private func loadItem(item:  WItem) {
-        let url = self.urlHandler.handle(item: item)
+        let url = self.makeUrl(item: item)
         if let image = self.storageHanler.getImage(url: url) {
             item.completion?(image)
             return

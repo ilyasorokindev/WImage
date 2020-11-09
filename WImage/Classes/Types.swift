@@ -26,9 +26,11 @@ extension NSImage {
 }
 
 #else
+
 import UIKit
 
 public typealias WPlatformImage = UIImage
+public typealias WPlatformFloat = CGFloat
 
 extension Constants {
     static let scale = UIScreen.main.scale

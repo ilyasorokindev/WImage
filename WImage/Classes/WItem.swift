@@ -11,8 +11,8 @@ public class WItem {
     public let id: UInt
     public let url: URL
     internal let completion: WCompletion?
-    internal(set) public var width: CGFloat?
-    internal(set) public var height: CGFloat?
+    internal(set) public var width: WPlatformFloat?
+    internal(set) public var height: WPlatformFloat?
     internal(set) public var priority = Priority.normal
     
     internal init(id: UInt,
