@@ -10,6 +10,7 @@ public class WImage {
     private var urlHandler: WURLHandlerProtocol = WURLHandler()
     private var storageHanler: WStorageHandlerProtocol = WStorageHandler()
     private var networkHandler: WNetworkHandlerProtocol = WNetworkHandler()
+    private var errorHandler: WErrorHandlerProtocol = WErrorHandler()
     
     private let loadingLocker = NSLock()
     private(set) internal var loadingItems = [URL : WLoadingModel]()
@@ -32,6 +33,12 @@ public class WImage {
     @discardableResult
     public func setNetworkHandler(networkHandler: WNetworkHandlerProtocol) -> WImage {
         self.networkHandler = networkHandler
+        return self
+    }
+    
+    @discardableResult
+    public func setErrorHandler(errorHandler: WErrorHandlerProtocol) -> WImage {
+        self.errorHandler = errorHandler
         return self
     }
     
@@ -126,16 +133,20 @@ public class WImage {
             return
         }
         let item = self.networkHandler.load(url: url, completion: { url, image, data, error, count in
-            self.downloaded(url: url, image: image, data: data, erro: error, count: count)
+            self.downloaded(url: url, image: image, data: data, error: error, count: count)
         })
         self.loadingItems[url] =  WLoadingModel(loadingItem: item).add(id: id, completion: completion)
         self.loadingLocker.unlock()
         item.start()
     }
     
-    private func downloaded(url: URL, image: WPlatformImage?, data: Data?, erro: Error?, count: Int) {
+    private func downloaded(url: URL, image: WPlatformImage?, data: Data?, error: Error?, count: Int) {
         if let image = image, let data = data {
             self.storageHanler.saveImage(url: url, image: image, imageData: data)
+        } else if let error = error {
+            if let image = self.errorHandler.haandle(error: error, data: data) {
+                self.storageHanler.saveImage(url: url, image: image, imageData: image.jpegData(compressionQuality: 1)!)
+            }
         }
         DispatchQueue.main.async {
             self.loadingLocker.lock()
