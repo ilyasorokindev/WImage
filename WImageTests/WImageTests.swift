@@ -19,13 +19,13 @@ class WImageTests: XCTestCase {
     }
     
     func testLoading() throws {
-        let url = URL(string: "http://lorempixel.com/100/100/")!
+        let path =  "http://lorempixel.com/100/100/"
         var count = 2
-        let i1 = WImage.shared.load(url: url, completion: { image in
+        let i1 = WImage.shared.load(path: path, completion: { image in
             count -= 1
             XCTAssert(image != nil)
         })
-        let i2 = WImage.shared.load(url: url, completion: { image in
+        let i2 = WImage.shared.load(path: path, completion: { image in
             count -= 1
             XCTAssert(image != nil)
         })

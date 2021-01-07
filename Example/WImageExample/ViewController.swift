@@ -21,7 +21,7 @@ class ViewController: UIViewController {
 
     @IBAction func onSwitch(_ sender: Any) {
         if self.switch.isOn {
-            WImage.shared.load(url: Constants.url1, completion: { image in
+            WImage.shared.load(path: Constants.url1, completion: { image in
                 self.imageViewTop.image = image
             })
         } else {
@@ -31,7 +31,7 @@ class ViewController: UIViewController {
     }
     
     private func setButtomImage() {
-        WImage.shared.load(url: Constants.url2, width: self.switch.isOn ? self.view.frame.width : 100.0, priority: Priority.normal, completion: { image in
+        WImage.shared.load(path: Constants.url2, width: self.switch.isOn ? self.view.frame.width : 100.0, priority: Priority.normal, completion: { image in
             self.imageViewBottom.image = image
         })
     }

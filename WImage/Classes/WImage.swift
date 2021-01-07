@@ -43,14 +43,14 @@ public class WImage {
     }
     
     @discardableResult
-    public func load(url: URL,
+    public func load(path: String,
                      width: WPlatformFloat? = nil,
                      height: WPlatformFloat? = nil,
                      priority: Priority = .normal,
                      completion: WCompletion? = nil) -> WItem {
         
         let item = WItem(id: self.createID(),
-                         url: url,
+                         path: path,
                          completion: completion)
         self.updateItem(item: item, width: width, height: height,
                         priority: priority, resetOther: true)
@@ -73,7 +73,9 @@ public class WImage {
     
     @discardableResult
     public func cancel(item:  WItem) -> WImage  {
-        let url = self.makeUrl(item: item)
+        guard let url = self.makeUrl(item: item) else {
+            return self
+        }
         self.loadingLocker.lock()
         if self.loadingItems[url]?.cancel(id: item.id).isEmpty ?? false{
             self.loadingItems[url] = nil
@@ -89,10 +91,10 @@ public class WImage {
         return self.counter
     }
    
-    private func makeUrl(item:  WItem) -> URL {
+    private func makeUrl(item:  WItem) -> URL? {
         let width: Int? = item.width != nil ? Int(item.width! * Constants.scale) : nil
         let height: Int? = item.height != nil ? Int(item.height! * Constants.scale) : nil
-        return self.urlHandler.handle(url: item.url, width: width, height: height)
+        return self.urlHandler.handle(path: item.path, width: width, height: height)
     }
     
     private func updateItem(item:  WItem,
@@ -116,7 +118,9 @@ public class WImage {
     }
     
     private func loadItem(item:  WItem) {
-        let url = self.makeUrl(item: item)
+        guard let url = self.makeUrl(item: item) else {
+            return
+        }
         if let image = self.storageHanler.getImage(url: url) {
             item.completion?(image)
             return

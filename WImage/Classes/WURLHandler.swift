@@ -8,11 +8,16 @@
 import Foundation
 
 public protocol WURLHandlerProtocol {
-    func handle(url: URL, width: Int?, height: Int?) -> URL
+    func handle(path: String, width: Int?, height: Int?) -> URL?
 }
 
 internal class WURLHandler: WURLHandlerProtocol {
-    func handle(url: URL, width: Int?, height: Int?) -> URL {
+    
+    func handle(path: String, width: Int?, height: Int?) -> URL? {
+        guard let url = URL(string: path) else {
+            return nil
+        }
+        
         if width == nil && height == nil {
           return url
         }

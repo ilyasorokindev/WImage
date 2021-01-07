@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         WImage.shared.setURLHandler(urlHandler: self)
-        WImage.shared.load(url: Constants.url1, priority: .low)
+        WImage.shared.load(path: Constants.url1, priority: .low)
         return true
     }
 
@@ -39,7 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: WURLHandlerProtocol  {
     
-    func handle(url: URL, width: Int?, height: Int?) -> URL {
+    func handle(path: String, width: Int?, height: Int?) -> URL? {
+        guard let url = URL(string: path) else {
+            fatalError("Incorrect URL")
+        }
         guard let width = width else {
           return url
         }
