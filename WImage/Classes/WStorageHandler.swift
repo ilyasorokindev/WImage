@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol WStorageHandlerProtocol {
-    
+
     func getImage(url: URL) -> WPlatformImage?
     func saveImage(url: URL, image: WPlatformImage, imageData: Data)
     func removeImage(url: URL)
@@ -16,28 +16,27 @@ public protocol WStorageHandlerProtocol {
 }
 
 internal class WStorageHandler: WStorageHandlerProtocol {
-    
+
     private let fileManager = FileManager.default
     private let documentDirectoryUrl: URL = {
       do {
         let fileManager = FileManager.default
-        let url = try fileManager.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor:nil, create:false).appendingPathComponent(Constants.cacheName, isDirectory: true)
+        let url = try fileManager.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(Constants.cacheName, isDirectory: true)
         try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
         return url
       } catch {
         fatalError("can not get documentDirectoryUrl")
       }
-    } ()
-    
+    }()
+
     func getImage(url: URL) -> WPlatformImage? {
         let fileUrl = self.makeFileUrl(url: url)
-        do {
-          let data = try Data(contentsOf: fileUrl)
-          return WPlatformImage(data: data, scale: Constants.scale)
-        } catch { }
+        if let data = try? Data(contentsOf: fileUrl) {
+            return WPlatformImage(data: data, scale: Constants.scale)
+        }
         return nil
     }
-    
+
     func saveImage(url: URL, image: WPlatformImage, imageData: Data) {
         let fileUrl = self.makeFileUrl(url: url)
         do {
@@ -46,16 +45,12 @@ internal class WStorageHandler: WStorageHandlerProtocol {
           assertionFailure("Can not save file \(fileUrl.absoluteString)")
         }
     }
-    
+
     func removeImage(url: URL) {
         let fileUrl = self.makeFileUrl(url: url)
-        do {
-            try FileManager.default.removeItem(at: fileUrl)
-        } catch {
-            print("Could not delete file: \(error)")
-        }
+      try? FileManager.default.removeItem(at: fileUrl)
     }
-    
+
     func removeAllImages() {
         DispatchQueue.global().async {
           do {
@@ -70,10 +65,10 @@ internal class WStorageHandler: WStorageHandlerProtocol {
           }
         }
     }
-    
+
     private func makeFileUrl(url: URL) -> URL {
-        let name = "\(url.host ?? "")_\(url.hashValue)"
+        let name = Data(url.absoluteString.utf8).base64EncodedString().replacingOccurrences(of: "/", with: "")
         return documentDirectoryUrl.appendingPathComponent(name, isDirectory: false)
       }
-    
+
 }

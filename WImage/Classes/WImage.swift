@@ -1,54 +1,53 @@
 import Foundation
 
-
 public class WImage {
     public static let shared = WImage()
-    
+
     private let counterLocker = NSLock()
     private var counter: UInt = 0
-    
+
     private var urlHandler: WURLHandlerProtocol = WURLHandler()
     private var storageHanler: WStorageHandlerProtocol = WStorageHandler()
     private var networkHandler: WNetworkHandlerProtocol = WNetworkHandler()
     private var errorHandler: WErrorHandlerProtocol = WErrorHandler()
-    
+
     private let loadingLocker = NSLock()
-    private(set) internal var loadingItems = [URL : WLoadingModel]()
-    
+    private(set) internal var loadingItems = [URL: WLoadingModel]()
+
     private init() {
     }
-    
+
     @discardableResult
     public func setURLHandler(urlHandler: WURLHandlerProtocol) -> WImage {
         self.urlHandler = urlHandler
         return self
     }
-    
+
     @discardableResult
     public func setStorageHanler(storageHanler: WStorageHandlerProtocol) -> WImage {
         self.storageHanler = storageHanler
         return self
     }
-    
+
     @discardableResult
     public func setNetworkHandler(networkHandler: WNetworkHandlerProtocol) -> WImage {
         self.networkHandler = networkHandler
         return self
     }
-    
+
     @discardableResult
     public func setErrorHandler(errorHandler: WErrorHandlerProtocol) -> WImage {
         self.errorHandler = errorHandler
         return self
     }
-    
+
     @discardableResult
     public func load(path: String,
                      width: WPlatformFloat? = nil,
                      height: WPlatformFloat? = nil,
                      priority: Priority = .normal,
                      completion: WCompletion? = nil) -> WItem {
-        
+
         let item = WItem(id: self.createID(),
                          path: path,
                          completion: completion)
@@ -57,9 +56,9 @@ public class WImage {
         self.loadItem(item: item)
         return item
     }
-    
+
     @discardableResult
-    public func update(item:  WItem,
+    public func update(item: WItem,
                        width: WPlatformFloat? = nil,
                        height: WPlatformFloat? = nil,
                        priority: Priority? = nil,
@@ -70,34 +69,34 @@ public class WImage {
         self.loadItem(item: item)
         return self
     }
-    
+
     @discardableResult
-    public func cancel(item:  WItem) -> WImage  {
+    public func cancel(item: WItem) -> WImage {
         guard let url = self.makeUrl(item: item) else {
             return self
         }
         self.loadingLocker.lock()
-        if self.loadingItems[url]?.cancel(id: item.id).isEmpty ?? false{
+        if self.loadingItems[url]?.cancel(id: item.id).isEmpty ?? false {
             self.loadingItems[url] = nil
         }
         self.loadingLocker.unlock()
         return self
     }
-    
+
     private func createID() -> UInt {
         self.counterLocker.lock()
         self.counter += 1
         defer { self.counterLocker.unlock() }
         return self.counter
     }
-   
-    private func makeUrl(item:  WItem) -> URL? {
+
+    private func makeUrl(item: WItem) -> URL? {
         let width: Int? = item.width != nil ? Int(item.width! * Constants.scale) : nil
         let height: Int? = item.height != nil ? Int(item.height! * Constants.scale) : nil
         return self.urlHandler.handle(path: item.path, width: width, height: height)
     }
-    
-    private func updateItem(item:  WItem,
+
+    private func updateItem(item: WItem,
                             width: WPlatformFloat?,
                             height: WPlatformFloat?,
                             priority: Priority?,
@@ -116,8 +115,8 @@ public class WImage {
             item.priority = priority ?? item.priority
         }
     }
-    
-    private func loadItem(item:  WItem) {
+
+    private func loadItem(item: WItem) {
         guard let url = self.makeUrl(item: item) else {
             return
         }
@@ -127,8 +126,8 @@ public class WImage {
         }
         self.download(url: url, id: item.id, completion: item.completion)
     }
-    
-    private func download(url:  URL, id: UInt, completion: WCompletion?) {
+
+    private func download(url: URL, id: UInt, completion: WCompletion?) {
         self.loadingLocker.lock()
         let loading = self.loadingItems[url] != nil
         if loading {
@@ -143,7 +142,7 @@ public class WImage {
         self.loadingLocker.unlock()
         item.start()
     }
-    
+
     private func downloaded(url: URL, image: WPlatformImage?, data: Data?, error: Error?, count: Int) {
         if let image = image, let data = data {
             self.storageHanler.saveImage(url: url, image: image, imageData: data)

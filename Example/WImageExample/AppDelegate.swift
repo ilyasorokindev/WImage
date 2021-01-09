@@ -13,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+
         WImage.shared.setURLHandler(urlHandler: self)
         WImage.shared.load(path: Constants.url1, priority: .low)
         return true
@@ -33,12 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-
 }
 
+extension AppDelegate: WURLHandlerProtocol {
 
-extension AppDelegate: WURLHandlerProtocol  {
-    
     func handle(path: String, width: Int?, height: Int?) -> URL? {
         guard let url = URL(string: path) else {
             fatalError("Incorrect URL")
@@ -53,7 +51,5 @@ extension AppDelegate: WURLHandlerProtocol  {
         let newUrlString = url.absoluteString.replacingOccurrences(of: "/100x100/", with: "/\(width)/")
         return URL(string: newUrlString)!
     }
-    
-
 
 }

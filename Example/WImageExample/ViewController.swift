@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var `switch`: UISwitch!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         self.setButtomImage()
     }
 
@@ -29,11 +29,10 @@ class ViewController: UIViewController {
         }
         self.setButtomImage()
     }
-    
+
     private func setButtomImage() {
         WImage.shared.load(path: Constants.url2, width: self.switch.isOn ? self.view.frame.width : 100.0, priority: Priority.normal, completion: { image in
             self.imageViewBottom.image = image
         })
     }
 }
-

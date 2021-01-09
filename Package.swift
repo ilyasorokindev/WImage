@@ -16,7 +16,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "WImage",
-            targets: ["WImage"]),
+            targets: ["WImage"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -32,6 +32,6 @@ let package = Package(
         .testTarget(
             name: "WImageTests",
             dependencies: ["WImage"],
-            path: "WImageTests"),
+            path: "WImageTests")
     ]
 )

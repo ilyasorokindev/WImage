@@ -8,13 +8,13 @@
 import Foundation
 
 public protocol WErrorHandlerProtocol {
-    
+
     func haandle(error: Error, data: Data?) -> WPlatformImage?
-    
+
 }
 
 class WErrorHandler: WErrorHandlerProtocol {
-    
+
     func haandle(error: Error, data: Data?) -> WPlatformImage? {
         debugPrint(error)
         if let data = data {
@@ -22,5 +22,5 @@ class WErrorHandler: WErrorHandlerProtocol {
         }
         return nil
     }
-    
+
 }

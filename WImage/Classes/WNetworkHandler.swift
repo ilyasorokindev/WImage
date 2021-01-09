@@ -16,37 +16,37 @@ public protocol WLoadingItemProtocol {
 }
 
 public protocol WNetworkHandlerProtocol {
-    
+
     var loadingCount: Int { get }
     var maxLoadingCount: Int { get }
-    
+
     func load(url: URL, completion: @escaping WFinishedAction) -> WLoadingItemProtocol
-    
+
 }
 
 internal class WNetworkHandler: WNetworkHandlerProtocol {
-    
+
     var loadingCount: Int {
         self.counterLocker.lock()
         defer { self.counterLocker.unlock() }
         return self.counter
     }
-    
+
     let maxLoadingCount: Int
-    
+
     private let session: URLSession
     private var counter = 0
     private let counterLocker = NSLock()
-    
+
     init() {
         let configuration = URLSessionConfiguration.ephemeral
         self.session = URLSession(configuration: configuration)
         self.maxLoadingCount = configuration.httpMaximumConnectionsPerHost
     }
-    
-    func load(url: URL, completion: @escaping (URL,  WPlatformImage?, Data?, Error?, Int) -> Void) -> WLoadingItemProtocol {
+
+    func load(url: URL, completion: @escaping (URL, WPlatformImage?, Data?, Error?, Int) -> Void) -> WLoadingItemProtocol {
         self.updateCounter(value: 1)
-        let task = self.session.dataTask(with: url) { (data, response, error) in
+        let task = self.session.dataTask(with: url) { (data, _, error) in
             if let error = error as NSError?, error.code == NSURLErrorCancelled {
               return
             }
@@ -68,7 +68,7 @@ internal class WNetworkHandler: WNetworkHandlerProtocol {
         }
         return task
     }
-    
+
     @discardableResult
     private func updateCounter(value: Int) -> Int {
         self.counterLocker.lock()
@@ -78,11 +78,10 @@ internal class WNetworkHandler: WNetworkHandlerProtocol {
     }
 }
 
-extension URLSessionTask: WLoadingItemProtocol{
-    
+extension URLSessionTask: WLoadingItemProtocol {
+
     public func start() {
         self.resume()
     }
-    
-    
+
 }

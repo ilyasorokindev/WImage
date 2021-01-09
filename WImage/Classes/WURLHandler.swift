@@ -12,12 +12,12 @@ public protocol WURLHandlerProtocol {
 }
 
 internal class WURLHandler: WURLHandlerProtocol {
-    
+
     func handle(path: String, width: Int?, height: Int?) -> URL? {
         guard let url = URL(string: path) else {
             return nil
         }
-        
+
         if width == nil && height == nil {
           return url
         }
