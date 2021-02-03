@@ -18,7 +18,7 @@ public protocol WStorageHandlerProtocol {
 internal class WStorageHandler: WStorageHandlerProtocol {
     
     private let fileManager = FileManager.default
-    private var imageCache = [URL: WPlatformImage]()
+    private var imageCache = [String: WPlatformImage]()
     private let documentDirectoryUrl: URL = {
         do {
             let fileManager = FileManager.default
@@ -32,12 +32,13 @@ internal class WStorageHandler: WStorageHandlerProtocol {
     
     func getImage(url: URL) -> WPlatformImage? {
         let fileUrl = self.makeFileUrl(url: url)
-        if let image = self.imageCache[fileUrl] {
+        let urlString = url.absoluteString
+        if let image = self.imageCache[urlString] {
             return image
         }
         if let data = try? Data(contentsOf: fileUrl) {
             let image = WPlatformImage(data: data, scale: Constants.scale)
-            self.imageCache[fileUrl] = image
+            self.imageCache[urlString] = image
             return image
         }
         return nil
@@ -45,7 +46,8 @@ internal class WStorageHandler: WStorageHandlerProtocol {
     
     func saveImage(url: URL, image: WPlatformImage, imageData: Data) {
         let fileUrl = self.makeFileUrl(url: url)
-        self.imageCache[fileUrl] = image
+        let urlString = url.absoluteString
+        self.imageCache[urlString] = image
         do {
             try imageData.write(to: fileUrl)
         } catch {
@@ -55,7 +57,8 @@ internal class WStorageHandler: WStorageHandlerProtocol {
     
     func removeImage(url: URL) {
         let fileUrl = self.makeFileUrl(url: url)
-        self.imageCache[fileUrl] = nil
+        let urlString = url.absoluteString
+        self.imageCache[urlString] = nil
         try? self.fileManager.removeItem(at: fileUrl)
     }
     
