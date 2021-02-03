@@ -21,7 +21,7 @@ class WLoadingModel {
     }
 
     @discardableResult
-    func cancel(id: UInt) -> WLoadingModel {
+    func cancel() -> WLoadingModel {
         self.loadingItem.cancel()
         return self
     }
