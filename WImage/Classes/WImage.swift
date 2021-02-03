@@ -77,7 +77,7 @@ public class WImage {
         }
         let urlString = url.absoluteString
         self.loadingLocker.lock()
-        if self.loadingItems[urlString]?.cancel(id: item.id).isEmpty ?? false {
+        if self.loadingItems[urlString]?.remove(id: item.id).isEmpty ?? false {
             self.loadingItems[urlString] = nil
         }
         self.loadingLocker.unlock()
