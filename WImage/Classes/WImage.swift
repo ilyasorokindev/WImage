@@ -12,7 +12,7 @@ public class WImage {
     private var errorHandler: WErrorHandlerProtocol = WErrorHandler()
 
     private let loadingLocker = NSLock()
-    private(set) internal var loadingItems = [String : WLoadingModel]()
+    private(set) internal var loadingItems = [URL : WLoadingModel]()
 
     private init() {
     }
@@ -75,10 +75,9 @@ public class WImage {
         guard let url = self.makeUrl(item: item) else {
             return self
         }
-        let urlString = url.absoluteString
         self.loadingLocker.lock()
-        if self.loadingItems[urlString]?.remove(id: item.id).isEmpty ?? false {
-            self.loadingItems[urlString] = nil
+        if self.loadingItems[url]?.remove(id: item.id).isEmpty ?? false {
+            self.loadingItems[url] = nil
         }
         self.loadingLocker.unlock()
         return self
@@ -129,18 +128,17 @@ public class WImage {
     }
 
     private func download(url: URL, id: UInt, completion: WCompletion?) {
-        let urlString = url.absoluteString
         self.loadingLocker.lock()
-        let loading = self.loadingItems[urlString] != nil
+        let loading = self.loadingItems[url] != nil
         if loading {
-            self.loadingItems[urlString]?.add(id: id, completion: completion)
+            self.loadingItems[url]?.add(id: id, completion: completion)
             self.loadingLocker.unlock()
             return
         }
         let item = self.networkHandler.load(url: url, completion: { url, image, data, error, count in
             self.downloaded(url: url, image: image, data: data, error: error, count: count)
         })
-        self.loadingItems[urlString] =  WLoadingModel(loadingItem: item).add(id: id, completion: completion)
+        self.loadingItems[url] =  WLoadingModel(loadingItem: item).add(id: id, completion: completion)
         self.loadingLocker.unlock()
         item.start()
     }
@@ -154,10 +152,9 @@ public class WImage {
             }
         }
         DispatchQueue.main.async {
-            let urlString = url.absoluteString
             self.loadingLocker.lock()
-            self.loadingItems[urlString]?.execute(image: image)
-            self.loadingItems[urlString] = nil
+            self.loadingItems[url]?.execute(image: image)
+            self.loadingItems[url] = nil
             self.loadingLocker.unlock()
         }
     }
