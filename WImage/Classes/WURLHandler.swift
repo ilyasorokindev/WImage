@@ -11,7 +11,7 @@ public protocol WURLHandlerProtocol {
     func handle(path: String,
                 width: Int?,
                 height: Int?,
-                filter: Int?) -> URL?
+                filter: String?) -> URL?
 }
 
 internal class WURLHandler: WURLHandlerProtocol {
@@ -19,7 +19,7 @@ internal class WURLHandler: WURLHandlerProtocol {
     func handle(path: String,
                 width: Int?,
                 height: Int?,
-                filter: Int?) -> URL? {
+                filter: String?) -> URL? {
         guard let url = URL(string: path) else {
             return nil
         }
@@ -38,7 +38,7 @@ internal class WURLHandler: WURLHandlerProtocol {
             queryItems.append(URLQueryItem(name: "height", value: String(height)))
         }
         if let filter = filter {
-            queryItems.append(URLQueryItem(name: "filter", value: String(filter)))
+            queryItems.append(URLQueryItem(name: "filter", value: filter))
         }
         components.queryItems = queryItems
         guard let newUrl = components.url else {

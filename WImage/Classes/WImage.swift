@@ -52,7 +52,7 @@ public class WImage {
     public func load(path: String,
                      width: WPlatformFloat? = nil,
                      height: WPlatformFloat? = nil,
-                     filter: Int? = nil,
+                     filter: String? = nil,
                      priority: Priority = .normal,
                      completion: WCompletion? = nil) -> WItem {
 
@@ -69,7 +69,7 @@ public class WImage {
     public func update(item: WItem,
                        width: WPlatformFloat? = nil,
                        height: WPlatformFloat? = nil,
-                       filter: Int? = nil,
+                       filter: String? = nil,
                        priority: Priority? = nil,
                        resetOther: Bool = false) -> WImage {
         self.cancel(item: item)
@@ -115,7 +115,7 @@ public class WImage {
     private func updateItem(item: WItem,
                             width: WPlatformFloat?,
                             height: WPlatformFloat?,
-                            filter: Int?,
+                            filter: String?,
                             priority: Priority?,
                             resetOther: Bool) {
         if resetOther {
