@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: WURLHandlerProtocol {
 
-    func handle(path: String, width: Int?, height: Int?) -> URL? {
+    func handle(path: String, width: Int?, height: Int?, filter: Int?) -> URL? {
         guard let url = URL(string: path) else {
             fatalError("Incorrect URL")
         }

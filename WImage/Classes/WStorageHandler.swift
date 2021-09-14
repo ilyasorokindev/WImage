@@ -10,7 +10,7 @@ import Foundation
 public protocol WStorageHandlerProtocol {
     
     func getImage(url: URL) -> WPlatformImage?
-    func saveImage(url: URL, image: WPlatformImage, imageData: Data)
+    func saveImage(url: URL, image: WPlatformImage)
     func removeImage(url: URL)
     func removeAllImages()
 }
@@ -43,10 +43,14 @@ internal class WStorageHandler: WStorageHandlerProtocol {
         return nil
     }
     
-    func saveImage(url: URL, image: WPlatformImage, imageData: Data) {
+    func saveImage(url: URL, image: WPlatformImage) {
         let fileUrl = self.makeFileUrl(url: url)
         self.imageCache[url] = image
         do {
+            guard let imageData = image.pngData() else {
+                assertionFailure("Incorrect data")
+                return
+            }
             try imageData.write(to: fileUrl)
         } catch {
             assertionFailure("Can not save file \(fileUrl.absoluteString)")

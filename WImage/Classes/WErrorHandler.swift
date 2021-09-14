@@ -9,17 +9,14 @@ import Foundation
 
 public protocol WErrorHandlerProtocol {
 
-    func haandle(error: Error, data: Data?) -> WPlatformImage?
+    func haandle(error: Error) -> WPlatformImage?
 
 }
 
 class WErrorHandler: WErrorHandlerProtocol {
 
-    func haandle(error: Error, data: Data?) -> WPlatformImage? {
+    func haandle(error: Error) -> WPlatformImage? {
         debugPrint(error)
-        if let data = data {
-            debugPrint(data)
-        }
         return nil
     }
 

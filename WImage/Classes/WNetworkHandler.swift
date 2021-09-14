@@ -8,7 +8,7 @@
 import Foundation
 
 // URL, Image, Image data, error, loading count
-public typealias WFinishedAction = (URL, WPlatformImage?, Data?, Error?, Int) -> Void
+public typealias WFinishedAction = (URL, WPlatformImage?, Error?, Int) -> Void
 
 public protocol WLoadingItemProtocol {
     func cancel()
@@ -44,7 +44,7 @@ internal class WNetworkHandler: WNetworkHandlerProtocol {
         self.maxLoadingCount = configuration.httpMaximumConnectionsPerHost
     }
 
-    func load(url: URL, completion: @escaping (URL, WPlatformImage?, Data?, Error?, Int) -> Void) -> WLoadingItemProtocol {
+    func load(url: URL, completion: @escaping WFinishedAction) -> WLoadingItemProtocol {
         self.updateCounter(value: 1)
         let task = self.session.dataTask(with: url) { (data, _, error) in
             if let error = error as NSError?, error.code == NSURLErrorCancelled {
@@ -57,7 +57,6 @@ internal class WNetworkHandler: WNetworkHandlerProtocol {
                         }
                         return nil
                        }(),
-                       data,
                        {
                         if let error = error as NSError?, error.code == NSURLErrorCancelled {
                             return nil
