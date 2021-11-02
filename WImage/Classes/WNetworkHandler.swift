@@ -8,7 +8,7 @@
 import Foundation
 
 // URL, Image, Image data, error, loading count
-public typealias WFinishedAction = (URL, WPlatformImage?, Error?, Int) -> Void
+public typealias WFinishedAction = (URL, Data?, Error?, Int) -> Void
 
 public protocol WLoadingItemProtocol {
     func cancel()
@@ -52,10 +52,7 @@ internal class WNetworkHandler: WNetworkHandlerProtocol {
             }
             completion(url,
                        {
-                        if let data = data {
-                            return WPlatformImage(data: data, scale: Constants.scale)
-                        }
-                        return nil
+                        return data
                        }(),
                        {
                         if let error = error as NSError?, error.code == NSURLErrorCancelled {

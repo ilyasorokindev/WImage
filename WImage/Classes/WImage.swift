@@ -156,22 +156,23 @@ public class WImage {
             self.loadingLocker.unlock()
             return
         }
-        let item = self.networkHandler.load(url: url, completion: { url, image, error, count in
-            self.downloaded(url: url, image: image, error: error, count: count)
+        let item = self.networkHandler.load(url: url, completion: { url, data, error, count in
+            self.downloaded(url: url, data: data, error: error, count: count)
         })
         self.loadingItems[url] =  WLoadingModel(loadingItem: item).add(id: id, completion: completion)
         self.loadingLocker.unlock()
         item.start()
     }
 
-    private func downloaded(url: URL, image: WPlatformImage?, error: Error?, count: Int) {
-        var newImage: WPlatformImage?
-        if let image = image {
-            let image = self.postHandler.handle(url: url, image: image)
-            self.storageHanler.saveImage(url: url, image: image)
+    private func downloaded(url: URL, data: Data?, error: Error?, count: Int) {
+        let newImage: WPlatformImage?
+        if let data = data, let image = self.postHandler.handle(url: url, data: data) {
+                self.storageHanler.saveImage(url: url, image: image)
             newImage = image
         } else if let error = error {
             newImage = self.errorHandler.haandle(error: error)
+        } else {
+            newImage = nil
         }
         DispatchQueue.main.async {
             self.loadingLocker.lock()

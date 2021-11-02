@@ -9,14 +9,14 @@ import UIKit
 
 public protocol WPostHandlerProtocol: AnyObject {
     
-    func handle(url: URL, image: WPlatformImage) -> WPlatformImage
+    func handle(url: URL, data: Data) -> WPlatformImage?
     
 }
 
 class WPostHandler: WPostHandlerProtocol {
     
-    func handle(url: URL, image: WPlatformImage) -> WPlatformImage {
-        return image
+    func handle(url: URL, data: Data) -> WPlatformImage? {
+       return WPlatformImage(data: data, scale: Constants.scale)
     }
 
 }
